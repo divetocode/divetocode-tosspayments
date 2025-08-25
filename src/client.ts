@@ -43,7 +43,32 @@ export class TossPaymentsAPI {
       throw new Error("FOREIGN_EASY_PAY requires amount.currency = 'USD'");
     }
 
-  return this.payment.requestPayment(params as unknown as PaymentOptions);
+    // SDK에 전달할 payload를 안전하게 구성 (메서드별 옵션만 첨부)
+    const base = {
+      method: params.method,
+      amount: params.amount,
+      orderId: params.orderId,
+      orderName: params.orderName,
+      successUrl: params.successUrl,
+      failUrl: params.failUrl,
+      customerEmail: params.customerEmail,
+      customerName: params.customerName,
+    };
+
+    const payload =
+      params.method === "CARD"
+        ? { ...base, card: params.card }
+        : params.method === "TRANSFER"
+        ? { ...base, transfer: params.transfer }
+        : params.method === "VIRTUAL_ACCOUNT"
+        ? { ...base, virtualAccount: params.virtualAccount }
+        : params.method === "FOREIGN_EASY_PAY"
+        ? { ...base, foreignEasyPay: params.foreignEasyPay }
+        : // MOBILE_PHONE / (CULTURE|BOOK|GAME)_GIFT_CERTIFICATE 는 추가 옵션 없음
+          base;
+
+    // SDK 내부 타입 의존하지 않고 안전하게 전달
+    return (this.payment as any).requestPayment(payload);
   }
 
   async requestBillingAuth(opts: {
