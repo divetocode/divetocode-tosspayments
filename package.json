@@ -1,6 +1,6 @@
 {
   "name": "@divetocode/tosspayments",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A TypeScript wrapper around @tosspayments/tosspayments-sdk for React, Next.js, and Node.js server integrations.",
   "exports": {
     ".": {
